@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-11
+    **Version**: 2024.7.1-12
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -21,6 +21,14 @@ blueprint:
               filter:
                 - device_class: temperature
                 #- domain: weather
+        outdoor_temp_delta:
+          name: Outdoor temperature delta from indoor temperature
+          description: This delta prevents the fan from running when small temperature differential inside vs outside
+          default: 3
+          selector:
+            number:
+              min: 0
+              max: 30
         # outdoor_humidity_entity:
         #   name: Outdoor humidity
         #   description: Outdoor humidity source
@@ -140,7 +148,7 @@ trigger:
     entity_id:
       - !input indoor_temp_entity
     above: !input outdoor_temp_entity
-    value_template: "{{ float(state.state) - 1 }}"
+    value_template: "{{ float(state.state) - outdoor_temp_delta }}"
   - alias: TempHeatOn
     id: TempOn
     enabled: "{{ heat_enabled }}"
@@ -148,7 +156,7 @@ trigger:
     entity_id:
       - !input indoor_temp_entity
     below: !input outdoor_temp_entity
-    value_template: "{{ float(state.state) + 1 }}"
+    value_template: "{{ float(state.state) + outdoor_temp_delta }}"
   # - alias: 'CO2'
   #   id: 'CO2'
   #   enabled: "{{ co2_enabled }}"
