@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-12
+    **Version**: 2024.7.1-13
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -140,7 +140,6 @@ variables:
 
 ##### Triggers #####
 trigger:
-  # Apply 1 degress offset so it does not run when less than 1 degree delta
   - alias: TempCoolOn
     id: TempOn
     enabled: "{{ cool_enabled }}"
@@ -157,19 +156,20 @@ trigger:
       - !input indoor_temp_entity
     below: !input outdoor_temp_entity
     value_template: "{{ float(state.state) + outdoor_temp_delta }}"
-  # - alias: 'CO2'
-  #   id: 'CO2'
-  #   enabled: "{{ co2_enabled }}"
-  #   platform: numeric_state
-  #   entity_id: !input indoor_c02_entity
-  #   above: !input indoor_c02_level
-  #   for:
-  #     minutes: 5
+  - alias: 'CO2'
+    id: 'CO2'
+    enabled: "{{ co2_enabled }}"
+    platform: numeric_state
+    entity_id: !input indoor_c02_entity
+    above: !input indoor_c02_level
+    # Wait 5 minuetes to prevent a momentary change from triggering
+    for:
+      minutes: 5
 
 ##### Actions ######
 action:
   choose:
-    - conditions: "{{ trigger.id == 'TempOn' }}"
+    - conditions: "{{ trigger.id == ''TempOn'' }}"
       alias: 'TempOn'
       sequence:
         - service: switch.turn_on
@@ -188,7 +188,7 @@ action:
             entity_id: !input fan_entity
 
     # If CO2 above limit turn on until below for 1 minute ignoring air quality
-    - conditions: "{{ trigger.id == 'CO2' }}"
+    - conditions: "{{ trigger.id == ''CO2'' }}"
       alias: 'CO2High'
       sequence:
         - variables:
