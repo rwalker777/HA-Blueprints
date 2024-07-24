@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-13
+    **Version**: 2024.7.1-14
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -169,7 +169,7 @@ trigger:
 ##### Actions ######
 action:
   choose:
-    - conditions: "{{ trigger.id == ''TempOn'' }}"
+    - conditions: '{{ trigger.id == ''TempOn'' }}'
       alias: 'TempOn'
       sequence:
         - service: switch.turn_on
@@ -188,7 +188,7 @@ action:
             entity_id: !input fan_entity
 
     # If CO2 above limit turn on until below for 1 minute ignoring air quality
-    - conditions: "{{ trigger.id == ''CO2'' }}"
+    - conditions: '{{ trigger.id == ''CO2'' }}'
       alias: 'CO2High'
       sequence:
         - variables:
