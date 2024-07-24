@@ -1,0 +1,201 @@
+blueprint:
+  name: AirExchange
+  description: >
+    Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
+
+    **Version**: 2024.7.1-11
+  domain: automation
+  source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
+  homeassistant:
+    min_version: 2024.6.0
+
+  input:
+    Outdoor:
+      name: Outdoor temperature, humidity and air quality
+      input:
+        outdoor_temp_entity:
+          name: Outdoor temperature
+          description: Outdoor temperature source
+          selector:
+            entity:
+              filter:
+                - device_class: temperature
+                #- domain: weather
+        # outdoor_humidity_entity:
+        #   name: Outdoor humidity
+        #   description: Outdoor humidity source
+        #   selector:
+        #     entity:
+        #       - device_class: humidity
+        #       - domain: weather
+        outdoor_aqi:
+          name: Outdoor air quality
+          description: Outdoor air quality source
+          selector:
+            entity:
+              filter:
+                - device_class: aqi
+        outdoor_aqi_level:
+          name: Outdoor air quality level
+          description: Outdoor air quality maximum level - above this fresh air is disabled
+          default: 151
+          selector:
+            number:
+              min: 50
+              max: 300
+    Indoor:
+      name: Indoor temperature, humidity and CO2
+      input:
+        fan_entity:
+          name: Fan
+          description: Entity to control Fan - can be a switch, fan
+          selector:
+            entity:
+              domain:
+                - fan
+                - switch
+        indoor_temp_entity:
+          name: Indoor temperature
+          description: Indoor temperature source
+          selector:
+            entity:
+              filter:
+                - device_class: temperature
+        indoor_temp_upper:
+          name: Indoor temperature upper limit
+          description: Target temperature range upper limit
+          default: 76
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: degree
+        indoor_temp_lower:
+          name: Indoor temperature lower limit
+          description: Target temperature range lower limit
+          default: 72
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: degree
+        indoor_humidity_entity:
+          name: Indoor humidity
+          description: Indoor humidity source
+          selector:
+            entity:
+              filter:
+                - device_class: humidity
+        indoor_humidity_upper:
+          name: Indoor humidity upper limit
+          description: Target humidity range upper limit
+          default: 65
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: percentage
+        indoor_c02_entity:
+          name: Indoor CO2
+          description: Indoor CO2 source
+          default: []
+          selector:
+            entity:
+              filter:
+                - device_class: carbon_dioxide
+        indoor_c02_level:
+          name: Indoor CO2 limit
+          description: Indoor CO2 level that forces air circulation
+          default: 1000
+          selector:
+            number:
+              min: 0
+              max: 2000
+
+#############
+mode: single
+variables:
+  indoor_co2_entity: !input indoor_c02_entity
+  co2_enabled: "{{ indoor_c02_entity != [] }}"
+  aqi_entity: !input outdoor_aqi
+  aqi_level: !input outdoor_aqi_level
+  above_aqi: "{{ states('aqi_entity') > aqi_level }}"
+  indoor_humidity_entity: !input indoor_humidity_entity
+  indoor_humidity_level: !input indoor_humidity_upper
+  above_humidity: "{{ states('indoor_humidity_entity') > indoor_humidity_level }}"
+  # Enable based on AQI, humidity and temp range
+  indoor_temp_entity: !input indoor_temp_entity
+  indoor_temp_upper: !input indoor_temp_upper
+  indoor_temp_lower: !input indoor_temp_lower
+  cool_enabled: "{{ states('indoor_temp_entity') > indoor_temp_upper and not ( above_aqi or above_humidity ) }}"
+  heat_enabled: "{{ states('indoor_temp_entity') < indoor_temp_lower and not ( above_aqi or above_humidity ) }}"
+
+##### Triggers #####
+trigger:
+  # Apply 1 degress offset so it does not run when less than 1 degree delta
+  - alias: TempCoolOn
+    id: TempOn
+    enabled: "{{ cool_enabled }}"
+    platform: numeric_state
+    entity_id:
+      - !input indoor_temp_entity
+    above: !input outdoor_temp_entity
+    value_template: "{{ float(state.state) - 1 }}"
+  - alias: TempHeatOn
+    id: TempOn
+    enabled: "{{ heat_enabled }}"
+    platform: numeric_state
+    entity_id:
+      - !input indoor_temp_entity
+    below: !input outdoor_temp_entity
+    value_template: "{{ float(state.state) + 1 }}"
+  # - alias: 'CO2'
+  #   id: 'CO2'
+  #   enabled: "{{ co2_enabled }}"
+  #   platform: numeric_state
+  #   entity_id: !input indoor_c02_entity
+  #   above: !input indoor_c02_level
+  #   for:
+  #     minutes: 5
+
+##### Actions ######
+action:
+  choose:
+    - conditions: "{{ trigger.id == 'TempOn' }}"
+      alias: 'TempOn'
+      sequence:
+        - service: switch.turn_on
+          target:
+            entity_id: !input fan_entity
+        - wait_for_trigger:
+          - platform: template
+            value_template: "{{ ( trigger.alias == 'TempCoolOn' and indoor_upper_temp <= states('indoor_temp_entity') ) or ( trigger.alias == 'TempHeatOn' and indoor_lower_temp >= states('indoor_temp_entity') ) }}"
+          timeout:
+            hours: 8
+            minutes: 0
+            seconds: 0
+            milliseconds: 0
+        - service: switch.turn_off
+          target:
+            entity_id: !input fan_entity
+
+    # If CO2 above limit turn on until below for 1 minute ignoring air quality
+    - conditions: "{{ trigger.id == 'CO2' }}"
+      alias: 'CO2High'
+      sequence:
+        - variables:
+            co2_level: !input indoor_c02_level
+        - service: switch.turn_on
+          target:
+            entity_id: !input fan_entity
+        - wait_for_trigger:
+          - platform: template
+            value_template: "{{ co2_level <= states('indoor_co2_entity') }}"
+          timeout:
+            hours: 8
+            minutes: 0
+            seconds: 0
+            milliseconds: 0
+        - service: switch.turn_off
+          target:
+            entity_id: !input fan_entity
