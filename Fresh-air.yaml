@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-1
+    **Version**: 2024.7.1-2
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -17,7 +17,6 @@ blueprint:
           name: Outdoor temperature
           description: Outdoor temperature source
           selector:
-            multiple: false
             device:
               entity:
                 - device_class: temperature
@@ -27,7 +26,6 @@ blueprint:
           description: Outdoor humidity source
           selector:
             device:
-              multiple: false
               entity:
                 - device_class: humdiity
                 - domain: weather
@@ -36,7 +34,6 @@ blueprint:
           description: Outdoor air quality source
           selector:
             device:
-              multiple: false
               entity:
                 - device_class: aqi
         outdoor_aqi_level:
@@ -55,7 +52,6 @@ blueprint:
           description:
           selector:
             entity:
-              multiple: false
               domain:
                 - climate
                 - fan
@@ -65,7 +61,6 @@ blueprint:
           description: Indoor temperature source
           selector:
             device:
-              multiple: false
               entity:
                 - device_class: temperature
         indoor_temp_upper:
@@ -91,7 +86,6 @@ blueprint:
           description: Indoor humidity source
           selector:
             device:
-              multiple: false
               entity:
                 - device_class: humdiity
         indoor_humidity_upper:
@@ -109,7 +103,6 @@ blueprint:
           default: []
           selector:
             device:
-              multiple: false
               entity:
                 - device_class: carbon_dioxide
         indoor_c02_level:
