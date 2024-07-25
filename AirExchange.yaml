@@ -22,18 +22,18 @@ blueprint:
                 - device_class: temperature
                 #- domain: weather
         temp_start_delta:
-          name: Outdoor temperature delta above indoor temperature to start air exchange
+          name: Outdoor temperature delta to indoor temperature to start air exchange
           description: This delta prevents the fan from running when small temperature differential inside vs outside
           default: 3
           selector:
             number:
-              min: 0
+              min: 1
               max: 30
               unit_of_measurement: degree
         temp_stop_delta:
-          name: Outdoor temperature delta above indoor temperature to stop air exchange *must be lower than start*
-          description: This delta stops the fans from running forever
-          default: 1
+          name: Outdoor temperature delta to indoor temperature to stop air exchange **must be lower than start**
+          description: This delta stops the fans from running forever - set to zero if you fans to always run
+          default: 2
           selector:
             number:
               min: 0
@@ -49,6 +49,7 @@ blueprint:
         outdoor_aqi:
           name: Outdoor air quality
           description: Outdoor air quality source
+          default: []
           selector:
             entity:
               filter:
@@ -74,7 +75,7 @@ blueprint:
                 - switch
         max_fan_runtime:
           name: Maximum time in hours for fan to run
-          description: Failsafe to prevent fan from running indefinitely
+          description: Failsafe to prevent fan from running indefinitely - set to zero to disable
           default: 8
           selector:
             number:
@@ -108,6 +109,7 @@ blueprint:
         indoor_humidity_entity:
           name: Indoor humidity
           description: Indoor humidity source
+          default: []
           selector:
             entity:
               filter:
