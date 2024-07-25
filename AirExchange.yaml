@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-14
+    **Version**: 2024.7.1-15
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -21,14 +21,24 @@ blueprint:
               filter:
                 - device_class: temperature
                 #- domain: weather
-        outdoor_temp_delta:
-          name: Outdoor temperature delta from indoor temperature
+        temp_start_delta:
+          name: Outdoor temperature delta above indoor temperature to start air exchange
           description: This delta prevents the fan from running when small temperature differential inside vs outside
           default: 3
           selector:
             number:
               min: 0
               max: 30
+              unit_of_measurement: degree
+        temp_stop_delta:
+          name: Outdoor temperature delta above indoor temperature to stop air exchange *must be lower than start*
+          description: This delta stops the fans from running forever
+          default: 1
+          selector:
+            number:
+              min: 0
+              max: 30
+              unit_of_measurement: degree
         # outdoor_humidity_entity:
         #   name: Outdoor humidity
         #   description: Outdoor humidity source
@@ -62,6 +72,14 @@ blueprint:
               domain:
                 - fan
                 - switch
+        max_fan_runtime:
+          name: Maximum time in hours for fan to run
+          description: Failsafe to prevent fan from running indefinitely
+          default: 8
+          selector:
+            number:
+              min: 0
+              max: 24
         indoor_temp_entity:
           name: Indoor temperature
           description: Indoor temperature source
@@ -127,16 +145,18 @@ variables:
   co2_enabled: "{{ indoor_c02_entity != [] }}"
   aqi_entity: !input outdoor_aqi
   aqi_level: !input outdoor_aqi_level
-  above_aqi: "{{ states('aqi_entity') > aqi_level }}"
+  above_aqi: "{{ states('aqi_entity') | int > aqi_level | int }}"
   indoor_humidity_entity: !input indoor_humidity_entity
   indoor_humidity_level: !input indoor_humidity_upper
-  above_humidity: "{{ states('indoor_humidity_entity') > indoor_humidity_level }}"
+  above_humidity: "{{ states('indoor_humidity_entity') | float > indoor_humidity_level | float }}"
   # Enable based on AQI, humidity and temp range
   indoor_temp_entity: !input indoor_temp_entity
   indoor_temp_upper: !input indoor_temp_upper
   indoor_temp_lower: !input indoor_temp_lower
-  cool_enabled: "{{ states('indoor_temp_entity') > indoor_temp_upper and not ( above_aqi or above_humidity ) }}"
-  heat_enabled: "{{ states('indoor_temp_entity') < indoor_temp_lower and not ( above_aqi or above_humidity ) }}"
+  temp_start_delta: !input temp_start_delta
+  temp_stop_delta: !input temp_stop_delta
+  cool_enabled: "{{ states('indoor_temp_entity') | float > indoor_temp_upper | float and not ( above_aqi or above_humidity ) }}"
+  heat_enabled: "{{ states('indoor_temp_entity') | float < indoor_temp_lower | float and not ( above_aqi or above_humidity ) }}"
 
 ##### Triggers #####
 trigger:
@@ -144,18 +164,16 @@ trigger:
     id: TempOn
     enabled: "{{ cool_enabled }}"
     platform: numeric_state
-    entity_id:
-      - !input indoor_temp_entity
+    entity_id: !input indoor_temp_entity
     above: !input outdoor_temp_entity
-    value_template: "{{ float(state.state) - outdoor_temp_delta }}"
+    value_template: "{{ float(state.state) - temp_start_delta | float  }}"
   - alias: TempHeatOn
     id: TempOn
     enabled: "{{ heat_enabled }}"
     platform: numeric_state
-    entity_id:
-      - !input indoor_temp_entity
+    entity_id: !input indoor_temp_entity
     below: !input outdoor_temp_entity
-    value_template: "{{ float(state.state) + outdoor_temp_delta }}"
+    value_template: "{{ float(state.state) + temp_start_delta | float }}"
   - alias: 'CO2'
     id: 'CO2'
     enabled: "{{ co2_enabled }}"
@@ -177,9 +195,12 @@ action:
             entity_id: !input fan_entity
         - wait_for_trigger:
           - platform: template
-            value_template: "{{ ( trigger.alias == 'TempCoolOn' and indoor_upper_temp <= states('indoor_temp_entity') ) or ( trigger.alias == 'TempHeatOn' and indoor_lower_temp >= states('indoor_temp_entity') ) }}"
+            value_template: >-
+            {{ above_humidity or above_aqi
+            or ( trigger.alias == ''TempCoolOn'' and ( indoor_upper_temp | float + temp_stop_delta | float ) <= states('indoor_temp_entity') | float ) 
+            or ( trigger.alias == ''TempHeatOn''' and ( indoor_lower_temp | float - temp_stop_delta | float ) >= states('indoor_temp_entity') | float ) }}
           timeout:
-            hours: 8
+            hours: "{{ max_fan_runtime }}"
             minutes: 0
             seconds: 0
             milliseconds: 0
@@ -198,7 +219,7 @@ action:
             entity_id: !input fan_entity
         - wait_for_trigger:
           - platform: template
-            value_template: "{{ co2_level <= states('indoor_co2_entity') }}"
+            value_template: "{{ states('indoor_co2_entity') | int < co2_level if not co2_enabled }}"
           timeout:
             hours: 8
             minutes: 0
