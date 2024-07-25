@@ -31,8 +31,9 @@ blueprint:
               max: 30
               unit_of_measurement: degree
         temp_stop_delta:
-          name: Outdoor temperature delta to indoor temperature to stop air exchange **must be lower than start**
-          description: This delta stops the fans from running forever - set to zero if you fans to always run
+          name: >
+            Outdoor temperature delta to indoor temperature to stop air exchange **must be lower than start**
+          description: This delta stops the fans from running forever - set to zero for fans to always run
           default: 2
           selector:
             number:
