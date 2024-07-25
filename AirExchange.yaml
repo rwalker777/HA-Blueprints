@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-15
+    **Version**: 2024.7.1-16
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/Fresh-air.yaml  
   homeassistant:
@@ -198,7 +198,7 @@ action:
             value_template: >-
             {{ above_humidity or above_aqi
             or ( trigger.alias == ''TempCoolOn'' and ( indoor_upper_temp | float + temp_stop_delta | float ) <= states('indoor_temp_entity') | float ) 
-            or ( trigger.alias == ''TempHeatOn''' and ( indoor_lower_temp | float - temp_stop_delta | float ) >= states('indoor_temp_entity') | float ) }}
+            or ( trigger.alias == ''TempHeatOn'' and ( indoor_lower_temp | float - temp_stop_delta | float ) >= states('indoor_temp_entity') | float ) }}
           timeout:
             hours: "{{ max_fan_runtime }}"
             minutes: 0
