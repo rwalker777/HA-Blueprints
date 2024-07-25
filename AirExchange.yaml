@@ -221,7 +221,7 @@ action:
             entity_id: !input fan_entity
         - wait_for_trigger:
           - platform: template
-            value_template: "{{ states('indoor_co2_entity') | int < co2_level if not co2_enabled }}"
+            value_template: "{{ states('indoor_co2_entity') | int < co2_level if co2_enabled }}"
           timeout:
             hours: 8
             minutes: 0
