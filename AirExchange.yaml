@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-27
+    **Version**: 2024.7.1-28
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -158,6 +158,18 @@ variables:
   temp_stop_delta: !input temp_stop_delta
 
 trigger_variables:
+  indoor_co2_entity: !input indoor_co2
+  aqi_entity: !input outdoor_aqi
+  aqi_level: !input outdoor_aqi_level
+  above_aqi: '{{ states(aqi_entity) | int(0) > 0 and states(aqi_entity) | int(0) > aqi_level | int(0) }}'
+  indoor_humidity_entity: !input indoor_humidity_entity
+  indoor_humidity_level: !input indoor_humidity_upper
+  above_humidity: '{{ states(indoor_humidity_entity) | float(0) > 0 and states(indoor_humidity_entity) | float(0) > indoor_humidity_level | float(0) }}'
+  indoor_temp_entity: !input indoor_temp
+  indoor_temp_upper: !input indoor_temp_upper
+  indoor_temp_lower: !input indoor_temp_lower
+  temp_start_delta: !input temp_start_delta
+  temp_stop_delta: !input temp_stop_delta
   indoor_co2_entity_is_valid: '{{ indoor_co2_entity is defined and indoor_co2_entity is string and indoor_co2_entity.split(".") | count == 2 }}'
   temp_entity_is_valid: '{{ indoor_temp_entity is defined and indoor_temp_entity is string and indoor_temp_entity.split(".") | count == 2 }}'
 
