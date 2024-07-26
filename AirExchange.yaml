@@ -132,7 +132,7 @@ blueprint:
             entity:
               filter:
                 - device_class: carbon_dioxide
-        indoor_c02_level:
+        indoor_co2_level:
           name: Indoor CO2 limit
           description: Indoor CO2 level that forces air circulation
           default: 1000
@@ -145,7 +145,7 @@ blueprint:
 mode: single
 variables:
   indoor_co2_entity: !input indoor_co2_entity
-  co2_enabled: "{{ 'indoor_co2_entity' != [] }}"
+  co2_enabled: "{{ 'indoor_co2_entity'  != [] }}"
   aqi_entity: !input outdoor_aqi
   aqi_level: !input outdoor_aqi_level
   above_aqi: "{{ states('aqi_entity') | int(0) > 0 and states('aqi_entity') | int(0) > 'aqi_level' | int(0) }}"
@@ -181,8 +181,8 @@ trigger:
     id: 'CO2'
     enabled: "{{ co2_enabled }}"
     platform: numeric_state
-    entity_id: !input indoor_c02_entity
-    above: !input indoor_c02_level
+    entity_id: !input indoor_co2_entity
+    above: !input indoor_co2_level
     # Wait 5 minuetes to prevent a momentary change from triggering
     for:
       minutes: 5
@@ -216,7 +216,7 @@ action:
       alias: 'CO2High'
       sequence:
         - variables:
-            co2_level: !input indoor_c02_level
+            co2_level: !input indoor_co2_level
         - service: switch.turn_on
           target:
             entity_id: !input fan_entity
