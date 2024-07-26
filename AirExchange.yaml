@@ -148,10 +148,10 @@ variables:
   co2_enabled: "{{ 'indoor_c02_entity' != [] }}"
   aqi_entity: !input outdoor_aqi
   aqi_level: !input outdoor_aqi_level
-  above_aqi: "{{ states('aqi_entity') | int(0) > 'aqi_level' | int(0) }}"
+  above_aqi: "{{ states('aqi_entity') | int(0) > 0 and states('aqi_entity') | int(0) > 'aqi_level' | int(0) }}"
   indoor_humidity_entity: !input indoor_humidity_entity
   indoor_humidity_level: !input indoor_humidity_upper
-  above_humidity: "{{ states('indoor_humidity_entity') | float(0) > 'indoor_humidity_level' | float(0) }}"
+  above_humidity: "{{ states('indoor_humidity_entity') | float(0) > 0 and states('indoor_humidity_entity') | float(0) > 'indoor_humidity_level' | float(0) }}"
   # Enable based on AQI, humidity and temp range
   indoor_temp_entity: !input indoor_temp_entity
   indoor_temp_upper: !input indoor_temp_upper
