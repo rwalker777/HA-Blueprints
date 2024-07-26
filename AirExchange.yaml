@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-19
+    **Version**: 2024.7.1-20
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -124,7 +124,7 @@ blueprint:
               min: 0
               max: 100
               unit_of_measurement: percentage
-        indoor_c02_entity:
+        indoor_co2_entity:
           name: Indoor CO2
           description: Indoor CO2 source
           default: []
@@ -144,8 +144,8 @@ blueprint:
 #############
 mode: single
 variables:
-  indoor_co2_entity: !input indoor_c02_entity
-  co2_enabled: "{{ 'indoor_c02_entity' != [] }}"
+  indoor_co2_entity: !input indoor_co2_entity
+  co2_enabled: "{{ 'indoor_co2_entity' != [] }}"
   aqi_entity: !input outdoor_aqi
   aqi_level: !input outdoor_aqi_level
   above_aqi: "{{ states('aqi_entity') | int(0) > 0 and states('aqi_entity') | int(0) > 'aqi_level' | int(0) }}"
