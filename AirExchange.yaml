@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-22
+    **Version**: 2024.7.1-23
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -145,39 +145,41 @@ blueprint:
 mode: single
 variables:
   indoor_co2_entity: !input indoor_co2_entity
+  indoor_co2_entity_is_valid: '{{ indoor_co2_entity is defined and indoor_co2_entity is string and indoor_co2_entity.split(".") | count == 2 }}'
   aqi_entity: !input outdoor_aqi
   aqi_level: !input outdoor_aqi_level
-  above_aqi: "{{ states(aqi_entity) | int(0) > 0 and states(aqi_entity) | int(0) > aqi_level | int(0) }}"
+  above_aqi: '{{ states(aqi_entity) | int(0) > 0 and states(aqi_entity) | int(0) > aqi_level | int(0) }}'
   indoor_humidity_entity: !input indoor_humidity_entity
   indoor_humidity_level: !input indoor_humidity_upper
-  above_humidity: "{{ states(indoor_humidity_entity) | float(0) > 0 and states(indoor_humidity_entity) | float(0) > indoor_humidity_level | float(0) }}"
+  above_humidity: '{{ states(indoor_humidity_entity) | float(0) > 0 and states(indoor_humidity_entity) | float(0) > indoor_humidity_level | float(0) }}'
   indoor_temp_entity: !input indoor_temp_entity
   indoor_temp_upper: !input indoor_temp_upper
   indoor_temp_lower: !input indoor_temp_lower
   temp_start_delta: !input temp_start_delta
   temp_stop_delta: !input temp_stop_delta
-  cool_enabled: "{{ states(indoor_temp_entity) | float(0) > indoor_temp_upper | float(0) and not ( above_aqi or above_humidity ) }}"
-  heat_enabled: "{{ states(indoor_temp_entity) | float(0) < indoor_temp_lower | float(0) and not ( above_aqi or above_humidity ) }}"
+  temp_entity_is_valid: '{{ indoor_temp_entity is defined and indoor_temp_entity is string and indoor_temp_entity.split(".") | count == 2 }}'
+  cool_enabled: '{{ states(indoor_temp_entity) | float(0) > indoor_temp_upper | float(0) and not ( above_aqi or above_humidity ) }}'
+  heat_enabled: '{{ states(indoor_temp_entity) | float(0) < indoor_temp_lower | float(0) and not ( above_aqi or above_humidity ) }}'
 
 ##### Triggers #####
 trigger:
   - alias: TempCoolOn
     id: TempOn
-    enabled: "{{ cool_enabled }}"
+    enabled: "{{ cool_enabled if temp_entity_is_valid else false }}"
     platform: numeric_state
     entity_id: !input indoor_temp_entity
     above: !input outdoor_temp_entity
     value_template: "{{ float(state.state, 0) - temp_start_delta | float(0)  }}"
   - alias: TempHeatOn
     id: TempOn
-    enabled: "{{ heat_enabled }}"
+    enabled: "{{ heat_enabled if temp_entity_is_valid else false }}"
     platform: numeric_state
     entity_id: !input indoor_temp_entity
     below: !input outdoor_temp_entity
     value_template: "{{ float(state.state, 0) + temp_start_delta | float(0) }}"
   - alias: 'CO2'
     id: 'CO2'
-    enabled: "{{ indoor_co2_entity != [] }}"
+    enabled: "{{ indoor_co2_entity_is_valid }}"
     platform: numeric_state
     entity_id: !input indoor_co2_entity
     above: !input indoor_co2_level
