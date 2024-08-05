@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-35
+    **Version**: 2024.7.1-36
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -160,9 +160,9 @@ variables:
   temp_stop_delta: !input temp_stop_delta
   deubg:
     temp_cool_offset: "{{ states(indoor_temp_entity) | float(0) - temp_start_delta | float(0) if states(indoor_temp_entity) | float(0) > indoor_temp_upper | float(0) else states(indoor_temp_entity) | float(0) - 100 | float(0) }}"
-    cool_enabled: "{{ temp_cool_offset | float(0) > outdoor_temp_entity | float(0) }}"
+    cool_enabled: "{{ temp_cool_offset | float(0) > states(outdoor_temp_entity) | float(0) }}"
     temp_heat_offset: "{{ states(indoor_temp_entity) | float(0) + temp_start_delta | float(0) if states(indoor_temp_entity) | float(0) < indoor_temp_lower | float(0) else states(indoor_temp_entity) | float(0) + 100 | float(0) }}"
-    heat_enabled: "{{ temp_heat_offset | float(0) < outdoor_temp_entity | float(0) }}"
+    heat_enabled: "{{ temp_heat_offset | float(0) < states(outdoor_temp_entity) | float(0) }}"
     stop_check_cool_met: "{{ indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
     stop_check_cool_delta: "{{ states(outdoor_temp_entity) | float(0) + temp_start_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
     stop_check_heat_met: "{{ indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) }}"
