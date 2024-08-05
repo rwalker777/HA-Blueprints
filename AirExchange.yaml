@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-33
+    **Version**: 2024.7.1-34
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -152,6 +152,7 @@ variables:
   indoor_humidity_entity: !input indoor_humidity_entity
   indoor_humidity_level: !input indoor_humidity_upper
   above_humidity: '{{ states(indoor_humidity_entity) | float(0) > 0 and states(indoor_humidity_entity) | float(0) > indoor_humidity_level | float(0) }}'
+  outdoor_temp_entity: !input outdoor_temp_entity
   indoor_temp_entity: !input indoor_temp
   indoor_temp_upper: !input indoor_temp_upper
   indoor_temp_lower: !input indoor_temp_lower
