@@ -204,9 +204,9 @@ action:
           - platform: template
               value_template: >
                 {{ above_humidity or above_aqi or
-                ( trigger.alias == 'TempCoolOn' and  (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
+                ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
                 ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
-                ( trigger.alias == 'TempHeatOn' and  (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
+                ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
                 ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
           timeout:
             hours: "{{ max_fan_runtime }}"
