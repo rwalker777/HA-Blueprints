@@ -163,6 +163,10 @@ variables:
     ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
     ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
     ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
+  stop_check_cool_met: "{{ indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
+  stop_check_cool_delta: "{{ states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
+  stop_check_heat_met: "{{ indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) }}"
+  stop_check_heat_delta: "{{ states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) }}"
 
 trigger_variables:
   temp_start_delta: !input temp_start_delta
