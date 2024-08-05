@@ -158,12 +158,8 @@ variables:
   indoor_temp_lower: !input indoor_temp_lower
   temp_start_delta: !input temp_start_delta
   temp_stop_delta: !input temp_stop_delta
-  stop_check: >-
-    {{ above_humidity or above_aqi or
-    ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
-    ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
-    ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
-    ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
+  temp_cool_offset: "{{ states(indoor_temp_entity) | float(0) - temp_start_delta | float(0) if states(indoor_temp_entity) | float(0) > indoor_temp_upper | float(0) else states(indoor_temp_entity) | float(0) - 100 | float(0) }}"
+  temp_heat_offset: "{{ states(indoor_temp_entity) | float(0) + temp_start_delta | float(0) if states(indoor_temp_entity) | float(0) < indoor_temp_lower | float(0) else states(indoor_temp_entity) | float(0) + 100 | float(0) }}"
   stop_check_cool_met: "{{ indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
   stop_check_cool_delta: "{{ states(outdoor_temp_entity) | float(0) + temp_start_delta | float(0) >= states(indoor_temp_entity) | float(0) }}"
   stop_check_heat_met: "{{ indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) }}"
