@@ -157,6 +157,12 @@ variables:
   indoor_temp_lower: !input indoor_temp_lower
   temp_start_delta: !input temp_start_delta
   temp_stop_delta: !input temp_stop_delta
+  stop_check: >-
+    {{ above_humidity or above_aqi or
+    ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
+    ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
+    ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
+    ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
 
 trigger_variables:
   temp_start_delta: !input temp_start_delta
@@ -202,12 +208,12 @@ action:
             entity_id: !input fan_entity
         - wait_for_trigger:
           - platform: template
-              value_template: >
-                {{ above_humidity or above_aqi or
-                ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
-                ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
-                ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
-                ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
+            value_template: >-
+              {{ above_humidity or above_aqi or
+              ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
+              ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
+              ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
+              ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
           timeout:
             hours: "{{ max_fan_runtime }}"
             minutes: 0
