@@ -190,7 +190,8 @@ trigger:
     id: AutomationUpdate
     alias: AutomationUpdate
 
-##### Actions ######
+
+##### Actions #####
 action:
   choose:
     - conditions: '{{ trigger.id == ''TempOn'' }}'
