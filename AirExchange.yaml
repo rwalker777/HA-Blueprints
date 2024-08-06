@@ -22,7 +22,7 @@ blueprint:
                 - device_class: temperature
                 #- domain: weather
         temp_start_delta:
-          name: Outdoor temperature delta to indoor temperature to start air exchange
+          name: Outdoor temperature delta to indoor temperature for air exchange - starts/stop when outside this delta
           description: This delta prevents the fan from running when small temperature differential inside vs outside
           default: 3
           selector:
