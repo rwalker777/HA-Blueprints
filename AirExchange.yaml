@@ -183,11 +183,12 @@ trigger:
     platform: numeric_state
     entity_id: !input indoor_temp
     above: !input outdoor_temp_entity
-    value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) if float(state.state, 0) > indoor_temp_upper | float(0) else float(state.state, 0) - 100 | float(0) }}"
-    #value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) }}"
+    #value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) if float(state.state, 0) > indoor_temp_upper | float(0) else float(state.state, 0) - 100 | float(0) }}"
+    value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) }}"
   - alias: TempHeatOn
     id: TempOn
     #enabled: "{{ heat_enabled }}"
+    enabled: false
     platform: numeric_state
     entity_id: !input indoor_temp
     below: !input outdoor_temp_entity
