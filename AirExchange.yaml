@@ -183,8 +183,8 @@ trigger:
     platform: numeric_state
     entity_id: !input indoor_temp
     above: !input outdoor_temp_entity
-    #value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) if float(state.state, 0) > indoor_temp_upper | float(0) else float(state.state, 0) - 100 | float(0) }}"
-    value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) }}"
+    value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) if float(state.state, 0) > indoor_temp_upper | float(0) else float(state.state, 0) - 100 | float(0) }}"
+    #value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) }}"
   - alias: TempHeatOn
     id: TempOn
     #enabled: "{{ heat_enabled }}"
@@ -227,7 +227,7 @@ action:
               ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
               ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
           timeout:
-            hours: "{{ max_fan_runtime }}"
+            hours: "{{ max_fan_runtime | float(0) }}"
             minutes: 0
             seconds: 0
             milliseconds: 0
@@ -248,7 +248,7 @@ action:
           - platform: template
             value_template: "{{ states(indoor_co2_entity) | int(0) < co2_level | int(0) }}"
           timeout:
-            hours: "{{ max_fan_runtime }}"
+            hours: "{{ max_fan_runtime | float(0) }}"
             minutes: 0
             seconds: 0
             milliseconds: 0
