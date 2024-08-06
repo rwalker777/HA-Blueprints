@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-42
+    **Version**: 2024.7.1-43
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -144,6 +144,7 @@ blueprint:
 #############
 mode: single
 variables:
+  max_fan_runtime: !input max_fan_runtime
   indoor_co2_entity: !input indoor_co2
   indoor_co2_entity_is_valid: '{{ indoor_co2_entity is defined and indoor_co2_entity is string and indoor_co2_entity.split(".") | count == 2 }}'
   aqi_entity: !input outdoor_aqi
@@ -223,9 +224,9 @@ action:
             value_template: >-
               {{ above_humidity or above_aqi or
               ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
-              ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ))) or
+              ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) > states(indoor_temp_entity) | float(0) ))) or
               ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
-              ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ))) }}
+              ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) < states(indoor_temp_entity) | float(0) ))) }}
           timeout:
             hours: "{{ max_fan_runtime | float(0) }}"
             minutes: 0
