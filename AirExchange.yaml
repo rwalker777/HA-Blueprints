@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-43
+    **Version**: 2024.7.1-44
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -204,10 +204,10 @@ trigger:
     # Wait 5 minuetes to prevent a momentary change from triggering
     for:
       minutes: 5
-  - platform: event
-    event_type: automation_reloaded
-    id: AutomationUpdate
-    alias: AutomationUpdate
+  # - platform: event
+  #   event_type: automation_reloaded
+  #   id: AutomationUpdate
+  #   alias: AutomationUpdate
 
 
 ##### Actions #####
