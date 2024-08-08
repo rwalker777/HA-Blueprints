@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-44
+    **Version**: 2024.7.1-45
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -204,29 +204,81 @@ trigger:
     # Wait 5 minuetes to prevent a momentary change from triggering
     for:
       minutes: 5
-  # - platform: event
-  #   event_type: automation_reloaded
-  #   id: AutomationUpdate
-  #   alias: AutomationUpdate
-
 
 ##### Actions #####
 action:
   choose:
-    - conditions: '{{ trigger.id == ''TempOn'' }}'
-      alias: 'TempOn'
+    # If trigger was cool
+    - conditions: '{{ trigger.alias == ''TempCoolOn'' }}'
+      alias: 'ActionCoolOn'
       sequence:
         - service: switch.turn_on
           target:
             entity_id: !input fan_entity
         - wait_for_trigger:
-          - platform: template
-            value_template: >-
-              {{ above_humidity or above_aqi or
-              ( trigger.alias == 'TempCoolOn' and (( indoor_temp_upper | float(0) + temp_stop_delta | float(0) >= states(indoor_temp_entity) | float(0) ) or
-              ( states(outdoor_temp_entity) | float(0) + temp_stop_delta | float(0) > states(indoor_temp_entity) | float(0) ))) or
-              ( trigger.alias == 'TempHeatOn' and (( indoor_temp_lower | float(0) - temp_stop_delta | float(0) <= states(indoor_temp_entity) | float(0) ) or
-              ( states(outdoor_temp_entity) | float(0) - temp_stop_delta | float(0) < states(indoor_temp_entity) | float(0) ))) }}
+            - platform: numeric_state
+              entity_id:
+                - !input outdoor_aqi
+              above: !input outdoor_aqi_level
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_humidity_entity
+              above: !input indoor_humidity_upper
+            # Stop if indoor temp - start delta + 0.02 temp goes below outdoor - add 0.02 to keep it from immediately stopping right at the start delta
+            # IE - 84 inside - 4 + 0.02 < 80 outside
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_temp
+              below: !input outdoor_temp_entity
+              value_template: "{{ float(state.state, 0) - temp_start_delta | float(0) + 0.02 | float (0) }}"
+            # Stop if temp_upper is reached
+            # IE - 76 inside - 0.02 < 76 upper limit
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_temp
+              below: !input indoor_temp_upper
+              value_template: "{{ float(state.state, 0) - 0.02 | float(0) }}"
+          continue_on_timeout: true
+          timeout:
+            hours: "{{ max_fan_runtime | float(0) }}"
+            minutes: 0
+            seconds: 0
+            milliseconds: 0
+        - service: switch.turn_off
+          target:
+            entity_id: !input fan_entity
+
+    # If trigger was heat
+    - conditions: '{{ trigger.alias == ''TempHeatOn'' }}'
+      alias: 'ActionHeatOn'
+      sequence:
+        - service: switch.turn_on
+          target:
+            entity_id: !input fan_entity
+        - wait_for_trigger:
+            - platform: numeric_state
+              entity_id:
+                - !input outdoor_aqi
+              above: !input outdoor_aqi_level
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_humidity_entity
+              above: !input indoor_humidity_upper
+            # Stop if indoor temp + start delta - 0.02 temp goes above outdoor
+            # IE - 56 inside + 4 - 0.02 > 60 outside
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_temp
+              above: !input outdoor_temp_entity
+              value_template: "{{ float(state.state, 0) + temp_start_delta | float(0) - 0.02 | float (0) }}"
+            # Stop if temp_lower is reached
+            # IE - 72 inside + 0.02 > 72 upper limit
+            - platform: numeric_state
+              entity_id:
+                - !input indoor_temp
+              above: !input indoor_temp_lower
+              value_template: "{{ float(state.state, 0) + 0.02 | float(0) }}"
+          continue_on_timeout: true
           timeout:
             hours: "{{ max_fan_runtime | float(0) }}"
             minutes: 0
