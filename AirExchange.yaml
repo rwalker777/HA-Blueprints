@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2024.7.1-47
+    **Version**: 2024.7.1-48
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -300,7 +300,7 @@ action:
         - wait_for_trigger:
             - platform: numeric_state
               entity_id:
-                - !input indoor_co2_entity
+                - !input indoor_co2
               below: !input indoor_co2_level
           timeout:
             hours: "{{ max_fan_runtime | float(0) }}"
