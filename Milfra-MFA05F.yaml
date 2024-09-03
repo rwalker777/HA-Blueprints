@@ -47,7 +47,7 @@ time:
 
 select:
   - platform: tuya
-    name: relay_status
+    name: Relay power loss restore
     enum_datapoint: 14
     optimistic: true
     options:
@@ -55,13 +55,13 @@ select:
       1: "on"
       2: "memory"
   - platform: tuya
-    name: light_mode
+    name: LED status
     enum_datapoint: 15
     optimistic: true
     options:
       0: "none"
       1: "relay"
-      2: "pos"
+      2: "motion"
   - platform: tuya
     name: cds_state
     enum_datapoint: 44
@@ -78,14 +78,14 @@ select:
       0: "default"
       1: "now"
   - platform: tuya
-    name: pir_state
+    name: PIR status
     enum_datapoint: 47
     optimistic: true
     options:
       0: "on"
       1: "off"
   - platform: tuya
-    name: pir_sensitivity
+    name: PIR sensitivity
     enum_datapoint: 48
     optimistic: true
     options:
@@ -93,7 +93,7 @@ select:
       1: "middle"
       2: "high"
   - platform: tuya
-    name: pir_delay
+    name: PIR Delay
     enum_datapoint: 49
     optimistic: true
     options:
@@ -103,19 +103,19 @@ select:
 
 number:
   - platform: tuya
-    name: target_time
+    name: Target time
     number_datapoint: 102
     min_value: 0
     max_value: 1440
     step: 1
   - platform: tuya
-    name: appointment_time
+    name: Appointment time
     number_datapoint: 101
     min_value: 0
     max_value: 1440
     step: 1
   - platform: tuya
-    name: pir_delay
+    name: PIR Delay
     number_datapoint: 49
     min_value: 5
     max_value: 3600
