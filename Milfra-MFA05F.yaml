@@ -114,16 +114,10 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
-  - platform: tuya
-    name: PIR Delay
-    number_datapoint: 49
-    min_value: 5
-    max_value: 3600
-    step: 1
 
 switch:
   - platform: "tuya"
-    name: ${longname} switch
+    name: ${friendlyname} switch
     switch_datapoint: 1
   - platform: "tuya"
     name: "cds_switch"
