@@ -142,7 +142,7 @@ number:
 
 switch:
   - platform: "tuya"
-    name: ${friendlyname} switch
+    name: Switch
     switch_datapoint: 1
   - platform: "tuya"
     name: "cds_switch"
