@@ -149,7 +149,7 @@ switch:
     internal: True
 
 binary_sensor:
-  #Status Binary Sensor exposes the node state (if it’s connected to via MQTT/native API) for Home Assistant.
+  # Status Binary Sensor exposes the node state (if it’s connected to via MQTT/native API) for Home Assistant.
   - platform: status
     name: "Connection Status"
     id: connection_status
