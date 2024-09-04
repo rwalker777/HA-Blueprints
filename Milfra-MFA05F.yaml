@@ -58,6 +58,7 @@ select:
     name: Relay power loss restore
     enum_datapoint: 14
     optimistic: true
+    entity_category: config
     options:
       0: "off"
       1: "on"
@@ -66,6 +67,7 @@ select:
     name: LED status
     enum_datapoint: 15
     optimistic: true
+    entity_category: config
     options:
       0: "none"
       1: "relay"
@@ -74,6 +76,7 @@ select:
     name: cds_state
     enum_datapoint: 44
     optimistic: true
+    entity_category: config
     options:
       0: "range"
       1: "on"
@@ -83,6 +86,7 @@ select:
     name: cds_threshold
     enum_datapoint: 45
     optimistic: true
+    entity_category: config
     options:
       0: "default"
       1: "now"
@@ -92,6 +96,7 @@ select:
     name: PIR status
     enum_datapoint: 47
     optimistic: true
+    entity_category: config
     options:
       0: "on"
       1: "off"
@@ -101,6 +106,7 @@ select:
     name: PIR sensitivity
     enum_datapoint: 48
     optimistic: true
+    entity_category: config
     options:
       0: "low"
       1: "middle"
@@ -115,6 +121,7 @@ number:
     min_value: 5
     max_value: 3600
     step: 1
+    entity_category: config
     internal: True
   - platform: tuya
     name: Target time
@@ -122,6 +129,7 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
+    entity_category: config
     internal: True
   - platform: tuya
     name: Appointment time
@@ -129,6 +137,7 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
+    entity_category: config
     internal: True
 
 switch:
@@ -138,10 +147,12 @@ switch:
   - platform: "tuya"
     name: "cds_switch"
     switch_datapoint: 43
+    entity_category: config
     internal: True
   - platform: "tuya"
     name: "switch_pir"
     switch_datapoint: 46
+    entity_category: config
     internal: True
 
 binary_sensor:
