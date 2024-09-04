@@ -94,17 +94,15 @@ select:
       0: "low"
       1: "middle"
       2: "high"
+
+number:
   # Motion sensor delay
   - platform: tuya
     name: PIR Delay
-    enum_datapoint: 49
-    optimistic: true
-    options:
-      0: "low"
-      1: "middle"
-      2: "high"
-
-number:
+    number_datapoint: 49
+    min_value: 5
+    max_value: 3600
+    step: 1
   - platform: tuya
     name: Target time
     number_datapoint: 102
