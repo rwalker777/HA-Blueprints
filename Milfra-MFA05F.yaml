@@ -128,6 +128,13 @@ switch:
     name: "switch_pir"
     switch_datapoint: 46
 
+binary_sensor:
+  #Status Binary Sensor exposes the node state (if it’s connected to via MQTT/native API) for Home Assistant.
+  - platform: status
+    name: "Connection Status"
+    id: connection_status
+    entity_category: diagnostic
+
 text_sensor:
   - platform: tuya
     name: "timer"
@@ -135,6 +142,7 @@ text_sensor:
   - platform: uptime
     name: Uptime Sensor
     type: timestamp
+    entity_category: diagnostic
     internal: True
   - platform: wifi_info
     ip_address:
