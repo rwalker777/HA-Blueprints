@@ -46,6 +46,13 @@ time:
   - platform: homeassistant
     id: homeassistant_time
 
+sensor:
+  - platform: uptime
+    type: timestamp
+    name: Uptime Sensor
+    entity_category: diagnostic
+    internal: True
+
 select:
   - platform: tuya
     name: Relay power loss restore
@@ -139,11 +146,6 @@ text_sensor:
   - platform: tuya
     name: "timer"
     sensor_datapoint: 103
-  - platform: uptime
-    name: Uptime Sensor
-    type: timestamp
-    entity_category: diagnostic
-    internal: True
   - platform: wifi_info
     ip_address:
       name: "IP"
