@@ -46,12 +46,12 @@ time:
   - platform: homeassistant
     id: homeassistant_time
 
-sensor:
-  - platform: uptime
-    type: timestamp
-    name: Uptime Sensor
-    entity_category: diagnostic
-    internal: True
+# sensor:
+#   - platform: uptime
+#     type: timestamp
+#     name: Uptime Sensor
+#     entity_category: diagnostic
+#     internal: True
 
 select:
   - platform: tuya
