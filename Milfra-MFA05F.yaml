@@ -78,6 +78,7 @@ select:
       0: "range"
       1: "on"
       2: "off"
+    internal: True
   - platform: tuya
     name: cds_threshold
     enum_datapoint: 45
@@ -85,6 +86,7 @@ select:
     options:
       0: "default"
       1: "now"
+    internal: True
   # Enable/disable motion sensor
   - platform: tuya
     name: PIR status
@@ -93,6 +95,7 @@ select:
     options:
       0: "on"
       1: "off"
+    internal: True
   # Motion sensor sensitivity
   - platform: tuya
     name: PIR sensitivity
@@ -102,6 +105,7 @@ select:
       0: "low"
       1: "middle"
       2: "high"
+    internal: True
 
 number:
   # Motion sensor delay
@@ -111,18 +115,21 @@ number:
     min_value: 5
     max_value: 3600
     step: 1
+    internal: True
   - platform: tuya
     name: Target time
     number_datapoint: 102
     min_value: 0
     max_value: 1440
     step: 1
+    internal: True
   - platform: tuya
     name: Appointment time
     number_datapoint: 101
     min_value: 0
     max_value: 1440
     step: 1
+    internal: True
 
 switch:
   - platform: "tuya"
@@ -131,21 +138,25 @@ switch:
   - platform: "tuya"
     name: "cds_switch"
     switch_datapoint: 43
+    internal: True
   - platform: "tuya"
     name: "switch_pir"
     switch_datapoint: 46
+    internal: True
 
 binary_sensor:
   #Status Binary Sensor exposes the node state (if it’s connected to via MQTT/native API) for Home Assistant.
   - platform: status
     name: "Connection Status"
     id: connection_status
+    internal: True
     entity_category: diagnostic
 
 text_sensor:
   - platform: tuya
     name: "timer"
     sensor_datapoint: 103
+    internal: True
   - platform: wifi_info
     ip_address:
       name: "IP"
