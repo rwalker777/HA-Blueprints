@@ -30,8 +30,9 @@ captive_portal:
 
 web_server:
   include_internal: True
-  log: true
+  log: True
   port: 80
+  version: 3
 
 uart:
   rx_pin: RX1
@@ -131,3 +132,27 @@ text_sensor:
   - platform: tuya
     name: "timer"
     sensor_datapoint: 103
+  - platform: uptime
+    name: Uptime Sensor
+    type: timestamp
+    internal: True
+  - platform: wifi_info
+    ip_address:
+      name: "IP"
+      icon: "mdi:ip-outline"
+      update_interval:  ${update_interval_wifi}
+      internal: True
+    ssid:
+      name: "SSID"
+      icon: "mdi:wifi-settings"
+      update_interval:  ${update_interval_wifi}
+      internal: True
+    bssid:
+      name: "BSSID"
+      icon: "mdi:wifi-settings"
+      update_interval:  ${update_interval_wifi}
+      internal: True
+    mac_address:
+      name: "MAC"
+      icon: "mdi:network-outline"
+      internal: True
