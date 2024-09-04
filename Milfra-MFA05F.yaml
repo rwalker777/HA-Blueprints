@@ -152,6 +152,13 @@ binary_sensor:
     internal: True
     entity_category: diagnostic
 
+button:
+  - platform: restart
+    id: restart_button
+    name: "Restart"
+    entity_category: diagnostic
+    internal: True
+
 text_sensor:
   - platform: tuya
     name: "timer"
