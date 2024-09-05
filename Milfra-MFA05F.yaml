@@ -57,7 +57,7 @@ select:
       0: "Off"
       1: "On"
       2: "Memory"
-  # White (off state) LED
+  # White (off state) LED - motion doesnt' seem to do anything
   - platform: tuya
     name: LED status
     enum_datapoint: 15
