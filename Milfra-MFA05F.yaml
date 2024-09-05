@@ -119,18 +119,18 @@ number:
     step: 1
     entity_category: config
     internal: True
-  # Motion sensor start time in minutes from 00:00 (12:00am)
+  # Motion sensor stop time in minutes from 00:00 (12:00am)
   - platform: tuya
-    name: Motion start time
+    name: Motion stop time
     number_datapoint: 101
     min_value: 0
     max_value: 1440
     step: 1
     entity_category: config
     internal: True
-  # Motion sensor stop time in minutes from 00:00 (12:00am)
+  # Motion sensor start time in minutes from 00:00 (12:00am)
   - platform: tuya
-    name: Motion stop time
+    name: Motion start time
     number_datapoint: 102
     min_value: 0
     max_value: 1440
