@@ -47,42 +47,45 @@ time:
     id: homeassistant_time
 
 select:
+  # On power restore - switch state
   - platform: tuya
     name: Relay power loss restore
     enum_datapoint: 14
     optimistic: true
     entity_category: config
     options:
-      0: "off"
-      1: "on"
-      2: "memory"
+      0: "Off"
+      1: "On"
+      2: "Memory"
+  # White (off state) LED
   - platform: tuya
     name: LED status
     enum_datapoint: 15
     optimistic: true
     entity_category: config
     options:
-      0: "none"
-      1: "relay"
-      2: "motion"
+      0: "Off"
+      1: "Relay"
+      2: "Motion"
+  # Enable/disable motion turning on light
   - platform: tuya
-    name: cds_state
+    name: Motion light control
     enum_datapoint: 44
     optimistic: true
     entity_category: config
     options:
-      0: "range"
-      1: "on"
-      2: "off"
+      0: "On"
+      1: "Off"
     internal: True
+  # ??? Time based motion control????
   - platform: tuya
     name: cds_threshold
     enum_datapoint: 45
     optimistic: true
     entity_category: config
     options:
-      0: "default"
-      1: "now"
+      0: "Default"
+      1: "Now"
     internal: True
   # Enable/disable motion sensor
   - platform: tuya
@@ -91,8 +94,8 @@ select:
     optimistic: true
     entity_category: config
     options:
-      0: "on"
-      1: "off"
+      0: "On"
+      1: "Off"
     internal: True
   # Motion sensor sensitivity
   - platform: tuya
@@ -107,23 +110,16 @@ select:
     internal: True
 
 number:
-  # Motion sensor delay
+  # Motion sensor delay in seconds for light turn off
   - platform: tuya
-    name: PIR Delay
+    name: Motion Delay
     number_datapoint: 49
     min_value: 5
     max_value: 3600
     step: 1
     entity_category: config
     internal: True
-  - platform: tuya
-    name: Target time
-    number_datapoint: 102
-    min_value: 0
-    max_value: 1440
-    step: 1
-    entity_category: config
-    internal: True
+  # Motion sensor start time in minutes from 00:00 (12:00am)
   - platform: tuya
     name: Appointment time
     number_datapoint: 101
@@ -132,18 +128,30 @@ number:
     step: 1
     entity_category: config
     internal: True
+  # Motion sensor stop time in minutes from 00:00 (12:00am)
+  - platform: tuya
+    name: Target time
+    number_datapoint: 102
+    min_value: 0
+    max_value: 1440
+    step: 1
+    entity_category: config
+    internal: True
 
 switch:
-  - platform: "tuya"
+  # Relay
+  - platform: tuya
     name: Switch
     switch_datapoint: 1
-  - platform: "tuya"
+  # ???
+  - platform: tuya
     name: "cds_switch"
     switch_datapoint: 43
     entity_category: config
     internal: True
-  - platform: "tuya"
-    name: "switch_pir"
+  # Enable/disable PIR sensor  
+  - platform: tuya
+    name: Motion sensor
     switch_datapoint: 46
     entity_category: config
     internal: True
