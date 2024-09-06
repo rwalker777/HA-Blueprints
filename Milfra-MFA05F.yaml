@@ -174,7 +174,7 @@ button:
     internal: True
 
 text_sensor:
-  # ???? Remaining seconds in off timer ???
+  # DPid 103 is RAW - setting to text for now
   - platform: tuya
     name: Timing
     sensor_datapoint: 103
