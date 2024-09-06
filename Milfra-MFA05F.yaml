@@ -7,6 +7,7 @@ bk72xx:
 
 # Enable logging
 logger:
+  # This stops logging from being sent out UART.
   baud_rate: 0
 
 # Enable Home Assistant API
