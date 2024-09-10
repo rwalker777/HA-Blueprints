@@ -43,6 +43,8 @@ uart:
   baud_rate: ${baud_rate}
 
 tuya:
+  # the 'tuya' device must have an ID so we can call it in the lambdas
+  id: "tuyadevice"
   time_id: homeassistant_time
 
 time:
@@ -146,7 +148,7 @@ switch:
   - platform: tuya
     name: Switch
     switch_datapoint: 1
-  # Photosensitive switch - ??Motion activated light??
+  # Photosensitive switch - ??Enable LUX sensor so light only turns on when dark??
   - platform: tuya
     name: Photosensitive switch
     switch_datapoint: 43
