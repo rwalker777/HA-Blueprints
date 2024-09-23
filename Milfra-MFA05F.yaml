@@ -122,6 +122,9 @@ number:
     min_value: 5
     max_value: 3600
     step: 1
+    optimistic: true
+    initial_option: 300
+    restore_value: True
     entity_category: config
     internal: True
   # Motion sensor stop time in minutes from 00:00 (12:00 am)
@@ -131,6 +134,9 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
+    optimistic: true
+    initial_option: 1440
+    restore_value: True
     entity_category: config
     internal: True
   # Motion sensor start time in minutes from 00:00 (12:00 am)
@@ -140,6 +146,9 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
+    optimistic: true
+    initial_option: 0
+    restore_value: True
     entity_category: config
     internal: True
 
