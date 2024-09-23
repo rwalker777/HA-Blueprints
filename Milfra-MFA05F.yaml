@@ -82,19 +82,19 @@ select:
       0: "On"
       1: "Off"
     internal: True
-  # Illumination detection threshold - ??? Time based motion control????
+  # Time based motion control
   - platform: tuya
-    name: cds_threshold
+    name: Motion time
     enum_datapoint: 45
     optimistic: true
     entity_category: config
     options:
-      0: "Default"
-      1: "Now"
+      0: "On"
+      1: "Off"
     internal: True
   # Sensing status - ??Enable/disable motion sensor??
   - platform: tuya
-    name: Time of day motion
+    name: What-does-this-do
     enum_datapoint: 47
     optimistic: true
     entity_category: config
@@ -126,7 +126,7 @@ number:
     internal: True
   # Motion sensor stop time in minutes from 00:00 (12:00 am)
   - platform: tuya
-    name: Motion stop time
+    name: Motion time stop
     number_datapoint: 101
     min_value: 0
     max_value: 1440
@@ -135,7 +135,7 @@ number:
     internal: True
   # Motion sensor start time in minutes from 00:00 (12:00 am)
   - platform: tuya
-    name: Motion start time
+    name: Motion time start
     number_datapoint: 102
     min_value: 0
     max_value: 1440
