@@ -148,11 +148,12 @@ switch:
   - platform: tuya
     name: Switch
     switch_datapoint: 1
-  # Photosensitive switch - ??Enable LUX sensor so light only turns on when dark??
+  # Controls motion activation of relay
   - platform: tuya
-    name: Photosensitive switch
+    name: Motion activation
     switch_datapoint: 43
     entity_category: config
+    inverted: True
     internal: True
   # Sensor switch - ??Enable/disable PIR sensor??
   - platform: tuya
