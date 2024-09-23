@@ -8,8 +8,6 @@ bk72xx:
 # Enable logging
 logger:
   level: DEBUG
-  logs:
-    tuya: VERY_VERBOSE
   # This stops logging from being sent out UART.
   baud_rate: 0
 
