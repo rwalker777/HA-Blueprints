@@ -94,7 +94,7 @@ select:
     internal: True
   # Sensing status - ??Enable/disable motion sensor??
   - platform: tuya
-    name: Sensing status
+    name: Time of day motion
     enum_datapoint: 47
     optimistic: true
     entity_category: config
@@ -124,7 +124,7 @@ number:
     step: 1
     entity_category: config
     internal: True
-  # Motion sensor stop time in minutes from 00:00 (12:00am)
+  # Motion sensor stop time in minutes from 00:00 (12:00 am)
   - platform: tuya
     name: Motion stop time
     number_datapoint: 101
@@ -133,7 +133,7 @@ number:
     step: 1
     entity_category: config
     internal: True
-  # Motion sensor start time in minutes from 00:00 (12:00am)
+  # Motion sensor start time in minutes from 00:00 (12:00 am)
   - platform: tuya
     name: Motion start time
     number_datapoint: 102
