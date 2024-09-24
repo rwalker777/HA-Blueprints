@@ -122,11 +122,12 @@ number:
     min_value: 5
     max_value: 3600
     step: 1
-    optimistic: true
-    initial_value: 300
-    restore_value: True
     entity_category: config
     internal: True
+    datapoint_hidden:
+      datapoint_type: int
+      initial_value: 300
+      restore_value: True
   # Motion sensor stop time in minutes from 00:00 (12:00 am)
   - platform: tuya
     name: Motion time stop
@@ -134,11 +135,12 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
-    optimistic: true
-    initial_value: 1440
-    restore_value: True
     entity_category: config
     internal: True
+    datapoint_hidden:
+      datapoint_type: int
+      initial_value: 1440
+      restore_value: True
   # Motion sensor start time in minutes from 00:00 (12:00 am)
   - platform: tuya
     name: Motion time start
@@ -146,11 +148,12 @@ number:
     min_value: 0
     max_value: 1440
     step: 1
-    optimistic: true
-    initial_value: 0
-    restore_value: True
     entity_category: config
     internal: True
+    datapoint_hidden:
+      datapoint_type: int
+      initial_value: 0
+      restore_value: True
 
 switch:
   # Relay
