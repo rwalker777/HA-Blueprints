@@ -219,5 +219,6 @@ text_sensor:
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
+    icon: "mdi:wifi-settings"
     update_interval:  ${update_interval_wifi}
     internal: True
