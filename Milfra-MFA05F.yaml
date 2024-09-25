@@ -45,6 +45,7 @@ tuya:
   # the 'tuya' device must have an ID so we can call it in the lambdas
   id: "tuyadevice"
   time_id: homeassistant_time
+  ignore_mcu_update_on_datapoints: 103
 
 time:
   - platform: homeassistant
@@ -190,10 +191,10 @@ button:
 
 text_sensor:
   # DPid 103 is RAW - setting to text for now
-  - platform: tuya
-    name: Timing
-    sensor_datapoint: 103
-    internal: True
+  # - platform: tuya
+  #   name: Timing
+  #   sensor_datapoint: 103
+  #   internal: True
   - platform: wifi_info
     ip_address:
       name: "IP"
