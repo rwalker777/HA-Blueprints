@@ -215,3 +215,9 @@ text_sensor:
       name: "MAC"
       icon: "mdi:network-outline"
       internal: True
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval:  ${update_interval_wifi}
+    internal: True
