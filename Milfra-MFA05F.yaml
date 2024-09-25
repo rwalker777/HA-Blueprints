@@ -27,7 +27,6 @@ wifi:
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Milfra MFA05F Fallback Hotspot"
-    password: !secret wifi_password
 
 captive_portal:
 
