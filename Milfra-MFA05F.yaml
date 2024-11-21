@@ -191,6 +191,9 @@ button:
     internal: True
 
 text_sensor:
+  - platform: version
+    hide_timestamp: true
+    name: 'ESPHome Version'
   # DPid 103 is RAW - setting to text for now
   # - platform: tuya
   #   name: Timing
