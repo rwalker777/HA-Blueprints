@@ -102,7 +102,7 @@ select:
     options:
       0: "On"
       1: "Off"
-    internal: True
+    internal: true
   # Motion sensor sensitivity
   - platform: tuya
     name: PIR sensitivity
@@ -113,7 +113,7 @@ select:
       0: "low"
       1: "middle"
       2: "high"
-    internal: True
+    internal: false
 
 number:
   # Motion sensor delay in seconds for light turn off
@@ -124,7 +124,7 @@ number:
     max_value: 3600
     step: 1
     entity_category: config
-    internal: True
+    internal: false
     datapoint_hidden:
       datapoint_type: int
       initial_value: 300
