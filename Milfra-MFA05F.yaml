@@ -1,7 +1,7 @@
 esphome:
   name: ${devicename}
   friendly_name: ${friendlyname}
-  comment: "Milfra MFAO5F motion switch"
+  comment: "Milfra MFA05F motion switch"
   project:
     name: "Esphome.Milfra MFA05F"
     version: "2025.2.1"
