@@ -1,6 +1,10 @@
 esphome:
   name: ${devicename}
   friendly_name: ${friendlyname}
+  comment: "Milfra MFAO5F motion switch"
+  project:
+    name: "Esphome.Milfra MFA05F"
+    version: "2025.2.1"
 
 bk72xx:
   board: generic-bk7231n-qfn32-tuya
