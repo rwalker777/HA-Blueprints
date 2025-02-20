@@ -3,7 +3,7 @@ esphome:
   friendly_name: ${friendlyname}
   comment: "Milfra MFA05F motion switch"
   project:
-    name: "Esphome.Milfra MFA05F"
+    name: "Milfra.MFA05F"
     version: "2025.2.1"
 
 bk72xx:
