@@ -143,6 +143,8 @@ blueprint:
 
 #############
 mode: single
+exceeded: silent
+
 variables:
   max_fan_runtime: !input max_fan_runtime
   indoor_co2_entity: !input indoor_co2
