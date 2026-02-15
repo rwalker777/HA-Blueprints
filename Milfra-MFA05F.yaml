@@ -4,10 +4,11 @@ esphome:
   comment: "Milfra MFA05F motion switch"
   project:
     name: "Milfra.MFA05F"
-    version: "2025.2.1"
+    version: "2026.2.1"
 
 bk72xx:
-  board: generic-bk7231n-qfn32-tuya
+  #board: generic-bk7231n-qfn32-tuya
+  board: cbu
 
 # Enable logging
 logger:
@@ -24,6 +25,7 @@ api:
 ota:
   - platform: esphome
     password: !secret ota_password
+    safe_mode: true
 
 wifi:
   ssid: !secret wifi_ssid
