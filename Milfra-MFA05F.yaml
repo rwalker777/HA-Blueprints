@@ -26,6 +26,7 @@ ota:
   - platform: esphome
     password: !secret ota_password
     safe_mode: true
+  - platform: web_server
 
 wifi:
   ssid: !secret wifi_ssid
