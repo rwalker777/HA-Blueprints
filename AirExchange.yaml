@@ -3,7 +3,7 @@ blueprint:
   description: >
     Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
 
-    **Version**: 2026.11.0
+    **Version**: 2026.11.1
   domain: automation
   source_url: https://github.com/rwalker777/HA-Blueprints/blob/main/AirExchange.yaml
   homeassistant:
@@ -274,10 +274,18 @@ action:
                 {% if indoor is not number or outdoor is not number %}
                   true
                 {% else %}
-                  {% set stop_delta = temp_stop_delta | float(0) %}
-                  {% set hyst = temp_hysteresis | float(0) %}
-                  {% set upper = indoor_temp_upper | float(0) %}
-                  {{ (indoor - outdoor) <= stop_delta or indoor <= (upper - hyst) }}
+                  # Validate entities are available (not offline/disconnected)
+                  {% set indoor_available = indoor_temp_entity not in states['not_available'] and indoor_temp_entity != 'unavailable' %}
+                  {% set outdoor_available = outdoor_temp_entity not in states['not_available'] and outdoor_temp_entity != 'unavailable' %}
+                  {%- if not indoor_available or not outdoor_available %}
+                    true
+                  {%- else %}
+                    {% set stop_delta = temp_stop_delta | float(0) %}
+                    {% set hyst = temp_hysteresis | float(0) %}
+                    {% set upper = indoor_temp_upper | float(0) %}
+                    # Stop if: delta drops below configured temp_stop_delta, OR indoor reached target, OR temperatures reversed (outdoor now warmer than indoor + delta)
+                    {{ (indoor - outdoor) <= stop_delta or indoor <= (upper - hyst) or outdoor >= (indoor + temp_start_delta | float(0)) }}
+                  {%- endif %}
                 {% endif %}
               for:
                 minutes: 1
@@ -315,10 +323,18 @@ action:
                 {% if indoor is not number or outdoor is not number %}
                   true
                 {% else %}
-                  {% set stop_delta = temp_stop_delta | float(0) %}
-                  {% set hyst = temp_hysteresis | float(0) %}
-                  {% set lower = indoor_temp_lower | float(0) %}
-                  {{ (outdoor - indoor) <= stop_delta or indoor >= (lower + hyst) }}
+                  # Validate entities are available (not offline/disconnected)
+                  {% set indoor_available = indoor_temp_entity not in states['not_available'] and indoor_temp_entity != 'unavailable' %}
+                  {% set outdoor_available = outdoor_temp_entity not in states['not_available'] and outdoor_temp_entity != 'unavailable' %}
+                  {%- if not indoor_available or not outdoor_available %}
+                    true
+                  {%- else %}
+                    {% set stop_delta = temp_stop_delta | float(0) %}
+                    {% set hyst = temp_hysteresis | float(0) %}
+                    {% set lower = indoor_temp_lower | float(0) %}
+                    # Stop if: delta drops below configured temp_stop_delta, OR indoor reached target, OR temperatures reversed (outdoor now colder than indoor - delta)
+                    {{ (outdoor - indoor) <= stop_delta or indoor >= (lower + hyst) or outdoor <= (indoor - temp_start_delta | float(0)) }}
+                  {%- endif %}
                 {% endif %}
               for:
                 minutes: 1
