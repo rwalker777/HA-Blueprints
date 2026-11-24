@@ -1,7 +1,7 @@
 blueprint:
   name: AirExchange
   description: >
-    Automation for outside air exchange.  All measurements must be in same format (ie. don't mix celsius and farenheit.)
+    Automation for outside air exchange.  All measurements must be in same format (i.e. don't mix celsius and fahrenheit.)
 
     **Version**: 2026.11.1
   domain: automation
@@ -33,7 +33,8 @@ blueprint:
         temp_stop_delta:
           name: >
             Outdoor temperature delta to indoor temperature to stop air exchange **must be lower than start**
-          description: This delta stops the fans from running forever - set to zero for fans to always run
+          description: >
+            This delta stops the fan once temperature differential drops to this value - set to zero to run until outdoor and indoor reach parity
           default: 2
           selector:
             number:
@@ -164,13 +165,9 @@ max_exceeded: silent
 variables:
   max_fan_runtime: !input max_fan_runtime
   enable_heating: !input enable_heating
-  indoor_co2_entity: !input indoor_co2
-  indoor_co2_entity_is_valid: '{{ indoor_co2_entity is string and "." in indoor_co2_entity }}'
   aqi_entity: !input outdoor_aqi
-  aqi_entity_is_valid: '{{ aqi_entity is string and "." in aqi_entity }}'
   aqi_level: !input outdoor_aqi_level
   indoor_humidity_entity: !input indoor_humidity_entity
-  humidity_entity_is_valid: '{{ indoor_humidity_entity is string and "." in indoor_humidity_entity }}'
   indoor_humidity_level: !input indoor_humidity_upper
   outdoor_temp_entity: !input outdoor_temp_entity
   indoor_temp_entity: !input indoor_temp
@@ -190,13 +187,9 @@ trigger_variables:
   temp_hysteresis: !input temp_hysteresis
   enable_heating: !input enable_heating
   aqi_entity: !input outdoor_aqi
-  aqi_entity_is_valid: '{{ aqi_entity is string and "." in aqi_entity }}'
   aqi_level: !input outdoor_aqi_level
   indoor_humidity_entity: !input indoor_humidity_entity
-  humidity_entity_is_valid: '{{ indoor_humidity_entity is string and "." in indoor_humidity_entity }}'
   indoor_humidity_level: !input indoor_humidity_upper
-  indoor_co2_entity: !input indoor_co2
-  indoor_co2_entity_is_valid: '{{ indoor_co2_entity is string and "." in indoor_co2_entity }}'
 
 ##### Triggers #####
 trigger:
@@ -206,9 +199,11 @@ trigger:
     value_template: >
       {% set indoor = states(indoor_temp_entity) | float('none') %}
       {% set outdoor = states(outdoor_temp_entity) | float('none') %}
-      {% set aqi_val = states(aqi_entity) | float('none') if aqi_entity_is_valid else 'none' %}
+      {% set has_aqi = aqi_entity is string and '.' in aqi_entity %}
+      {% set aqi_val = states(aqi_entity) | float('none') if has_aqi else 'none' %}
       {% set above_aqi = aqi_val is number and aqi_val > (aqi_level | float(0)) %}
-      {% set hum_val = states(indoor_humidity_entity) | float('none') if humidity_entity_is_valid else 'none' %}
+      {% set has_hum = indoor_humidity_entity is string and '.' in indoor_humidity_entity %}
+      {% set hum_val = states(indoor_humidity_entity) | float('none') if has_hum else 'none' %}
       {% set above_humidity = hum_val is number and hum_val > (indoor_humidity_level | float(0)) %}
       {{
         indoor is number and outdoor is number
@@ -220,14 +215,16 @@ trigger:
       minutes: 2
   - alias: TempHeatOn
     id: TempHeatOn
-    enabled: "{{ enable_heating }}"
+    enabled: !input enable_heating
     platform: template
     value_template: >
       {% set indoor = states(indoor_temp_entity) | float('none') %}
       {% set outdoor = states(outdoor_temp_entity) | float('none') %}
-      {% set aqi_val = states(aqi_entity) | float('none') if aqi_entity_is_valid else 'none' %}
+      {% set has_aqi = aqi_entity is string and '.' in aqi_entity %}
+      {% set aqi_val = states(aqi_entity) | float('none') if has_aqi else 'none' %}
       {% set above_aqi = aqi_val is number and aqi_val > (aqi_level | float(0)) %}
-      {% set hum_val = states(indoor_humidity_entity) | float('none') if humidity_entity_is_valid else 'none' %}
+      {% set has_hum = indoor_humidity_entity is string and '.' in indoor_humidity_entity %}
+      {% set hum_val = states(indoor_humidity_entity) | float('none') if has_hum else 'none' %}
       {% set above_humidity = hum_val is number and hum_val > (indoor_humidity_level | float(0)) %}
       {{
         indoor is number and outdoor is number
@@ -237,15 +234,14 @@ trigger:
       }}
     for:
       minutes: 2
-  - alias: 'CO2'
-    id: 'CO2'
-    enabled: "{{ indoor_co2_entity_is_valid }}"
-    platform: numeric_state
-    entity_id: !input indoor_co2
-    above: !input indoor_co2_level
-    # Wait 5 minuetes to prevent a momentary change from triggering
-    for:
-      minutes: 5
+  # - alias: 'CO2'
+  #   id: 'CO2'
+  #   platform: numeric_state
+  #   entity_id: !input indoor_co2
+  #   above: !input indoor_co2_level
+  #   # Wait 5 minutes to prevent a momentary change from triggering
+  #   for:
+  #     minutes: 5
 
 ##### Actions #####
 action:
@@ -254,16 +250,18 @@ action:
     - conditions: '{{ trigger.id == ''TempCoolOn'' }}'
       alias: 'ActionCoolOn'
       sequence:
-        - service: homeassistant.turn_on
+        - action: homeassistant.turn_on
           target:
             entity_id: !input fan_entity
         - wait_for_trigger:
             # Stop immediately if outdoor AQI or indoor humidity exceeds limit
             - platform: template
               value_template: >
-                {% set aqi_val = states(aqi_entity) | float('none') if aqi_entity_is_valid else 'none' %}
+                {% set has_aqi = aqi_entity is string and '.' in aqi_entity %}
+                {% set aqi_val = states(aqi_entity) | float('none') if has_aqi else 'none' %}
                 {% set above_aqi = aqi_val is number and aqi_val > (aqi_level | float(0)) %}
-                {% set hum_val = states(indoor_humidity_entity) | float('none') if humidity_entity_is_valid else 'none' %}
+                {% set has_hum = indoor_humidity_entity is string and '.' in indoor_humidity_entity %}
+                {% set hum_val = states(indoor_humidity_entity) | float('none') if has_hum else 'none' %}
                 {% set above_humidity = hum_val is number and hum_val > (indoor_humidity_level | float(0)) %}
                 {{ above_aqi or above_humidity }}
             # Stop once delta drops to temp_stop_delta or indoor cools past upper limit by temp_hysteresis
@@ -274,18 +272,11 @@ action:
                 {% if indoor is not number or outdoor is not number %}
                   true
                 {% else %}
-                  # Validate entities are available (not offline/disconnected)
-                  {% set indoor_available = indoor_temp_entity not in states['not_available'] and indoor_temp_entity != 'unavailable' %}
-                  {% set outdoor_available = outdoor_temp_entity not in states['not_available'] and outdoor_temp_entity != 'unavailable' %}
-                  {%- if not indoor_available or not outdoor_available %}
-                    true
-                  {%- else %}
-                    {% set stop_delta = temp_stop_delta | float(0) %}
-                    {% set hyst = temp_hysteresis | float(0) %}
-                    {% set upper = indoor_temp_upper | float(0) %}
-                    # Stop if: delta drops below configured temp_stop_delta, OR indoor reached target, OR temperatures reversed (outdoor now warmer than indoor + delta)
-                    {{ (indoor - outdoor) <= stop_delta or indoor <= (upper - hyst) or outdoor >= (indoor + temp_start_delta | float(0)) }}
-                  {%- endif %}
+                  {% set stop_delta = temp_stop_delta | float(0) %}
+                  {% set hyst = temp_hysteresis | float(0) %}
+                  {% set upper = indoor_temp_upper | float(0) %}
+                  {# Stop if: delta drops to/below stop_delta, or indoor reached target - hysteresis #}
+                  {{ (indoor - outdoor) <= stop_delta or indoor <= (upper - hyst) }}
                 {% endif %}
               for:
                 minutes: 1
@@ -295,7 +286,7 @@ action:
             minutes: 0
             seconds: 0
             milliseconds: 0
-        - service: homeassistant.turn_off
+        - action: homeassistant.turn_off
           target:
             entity_id: !input fan_entity
 
@@ -303,16 +294,18 @@ action:
     - conditions: '{{ trigger.id == ''TempHeatOn'' }}'
       alias: 'ActionHeatOn'
       sequence:
-        - service: homeassistant.turn_on
+        - action: homeassistant.turn_on
           target:
             entity_id: !input fan_entity
         - wait_for_trigger:
             # Stop immediately if outdoor AQI or indoor humidity exceeds limit
             - platform: template
               value_template: >
-                {% set aqi_val = states(aqi_entity) | float('none') if aqi_entity_is_valid else 'none' %}
+                {% set has_aqi = aqi_entity is string and '.' in aqi_entity %}
+                {% set aqi_val = states(aqi_entity) | float('none') if has_aqi else 'none' %}
                 {% set above_aqi = aqi_val is number and aqi_val > (aqi_level | float(0)) %}
-                {% set hum_val = states(indoor_humidity_entity) | float('none') if humidity_entity_is_valid else 'none' %}
+                {% set has_hum = indoor_humidity_entity is string and '.' in indoor_humidity_entity %}
+                {% set hum_val = states(indoor_humidity_entity) | float('none') if has_hum else 'none' %}
                 {% set above_humidity = hum_val is number and hum_val > (indoor_humidity_level | float(0)) %}
                 {{ above_aqi or above_humidity }}
             # Stop once delta drops to temp_stop_delta or indoor warms past lower limit by temp_hysteresis
@@ -323,18 +316,11 @@ action:
                 {% if indoor is not number or outdoor is not number %}
                   true
                 {% else %}
-                  # Validate entities are available (not offline/disconnected)
-                  {% set indoor_available = indoor_temp_entity not in states['not_available'] and indoor_temp_entity != 'unavailable' %}
-                  {% set outdoor_available = outdoor_temp_entity not in states['not_available'] and outdoor_temp_entity != 'unavailable' %}
-                  {%- if not indoor_available or not outdoor_available %}
-                    true
-                  {%- else %}
-                    {% set stop_delta = temp_stop_delta | float(0) %}
-                    {% set hyst = temp_hysteresis | float(0) %}
-                    {% set lower = indoor_temp_lower | float(0) %}
-                    # Stop if: delta drops below configured temp_stop_delta, OR indoor reached target, OR temperatures reversed (outdoor now colder than indoor - delta)
-                    {{ (outdoor - indoor) <= stop_delta or indoor >= (lower + hyst) or outdoor <= (indoor - temp_start_delta | float(0)) }}
-                  {%- endif %}
+                  {% set stop_delta = temp_stop_delta | float(0) %}
+                  {% set hyst = temp_hysteresis | float(0) %}
+                  {% set lower = indoor_temp_lower | float(0) %}
+                  {# Stop if: delta drops to/below stop_delta, or indoor reached target + hysteresis #}
+                  {{ (outdoor - indoor) <= stop_delta or indoor >= (lower + hyst) }}
                 {% endif %}
               for:
                 minutes: 1
@@ -344,7 +330,7 @@ action:
             minutes: 0
             seconds: 0
             milliseconds: 0
-        - service: homeassistant.turn_off
+        - action: homeassistant.turn_off
           target:
             entity_id: !input fan_entity
 
@@ -354,7 +340,7 @@ action:
     #   sequence:
     #     - variables:
     #         co2_level: !input indoor_co2_level
-    #     - service: switch.turn_on
+    #     - action: homeassistant.turn_on
     #       target:
     #         entity_id: !input fan_entity
     #     - wait_for_trigger:
@@ -367,6 +353,6 @@ action:
     #         minutes: 0
     #         seconds: 0
     #         milliseconds: 0
-    #     - service: switch.turn_off
+    #     - action: homeassistant.turn_off
     #       target:
     #         entity_id: !input fan_entity
